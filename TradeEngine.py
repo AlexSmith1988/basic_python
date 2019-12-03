@@ -34,7 +34,15 @@ class Order:
         self.price = price
 
 
-filled = []
+class Stats:
+    filled = 0
+
+    def onFill(self):
+        self.filled += 2
+        return self.filled
+
+
+stats = Stats
 
 
 def processOrder(new_order):
@@ -43,9 +51,7 @@ def processOrder(new_order):
         mid_price = midPrice(order, new_order.side, new_order.price)
         if mid_price > 0:
             symbol_orders.remove(order)
-            filled.append(order)
-            filled.append(new_order)
-            if print_state: print("Filled at", mid_price, "product", new_order.product, "filled", len(filled))
+            if print_state: print("Filled at", mid_price, "product", new_order.product, "filled", stats.onFill())
             return
     symbol_orders.append(new_order)
 
