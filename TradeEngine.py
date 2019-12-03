@@ -42,7 +42,7 @@ class Stats:
         return self.filled
 
 
-stats = Stats
+stats = Stats()
 
 
 def processOrder(new_order):
@@ -51,7 +51,8 @@ def processOrder(new_order):
         mid_price = midPrice(order, new_order.side, new_order.price)
         if mid_price > 0:
             symbol_orders.remove(order)
-            if print_state: print("Filled at", mid_price, "product", new_order.product, "filled", stats.onFill())
+            stats.onFill()
+            if print_state: print("Filled at", mid_price, "product", new_order.product, "filled", stats.filled)
             return
     symbol_orders.append(new_order)
 
@@ -67,9 +68,11 @@ def midPrice(order, side, price):
 def generate():
     start_us = time.time()
     sides = ("buy", "sell")
-    for i in range(100_000):
-        processOrder(Order(random.choice(products), random.choice(sides), random.random() * 100))
-    print(time.time() - start_us)
+    orders_to_simulate = 100_000
+    mappable(range(orders_to_simulate)).map(
+        lambda _: Order(random.choice(products), random.choice(sides), random.random() * 100)).flatMap(processOrder)
+    print("Trading took", time.time() - start_us, "seconds. Filled", stats.filled, "out of", orders_to_simulate,
+          "orders")
 
 
 generate()
